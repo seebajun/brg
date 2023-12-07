@@ -2,11 +2,12 @@ const {
   agregarProducto,
   verificarCredenciales,
   consultarProducto,
+  crearUsuario,
 } = require("./consultas.js");
 
+const jwt = require("jsonwebtoken");
 const express = require("express");
 const app = express();
-const fs = require("fs");
 const cors = require("cors");
 
 PORT = 3000;
@@ -14,16 +15,33 @@ PORT = 3000;
 app.use(express.json());
 app.use(cors());
 
-// login
+app.get("/", async (req, res) => {
+  try {
+    const { email, password } = req.query;
+    if (!email || !password) {
+      throw {
+        code: 400,
+        message: "El email y la contraseña son obligatorios",
+      };
+    }
+    await verificarCredenciales(email, password);
+    res.send("Usuario creado exitosamente");
+  } catch (error) {
+    console.error(error);
+    res.status(error.code || 500).send(error.message || "Error interno del servidor");
+  }
+});
+
+//listo
 app.post("/", async (req, res) => {
   try {
     const { email, password } = req.body;
-    await verificarCredenciales(email, password);
-    const token = jwt.sing({ email }, "az_AZ");
+    await crearUsuario(email, password);
+    const token = jwt.sign({ email }, "az_AZ");
     res.send(token);
   } catch (error) {
     console.log(error);
-    res.status(error.code || 500).send(error);
+    res.status(error.code || 500).send(error.message || "Error interno del servidor");
   }
 });
 
@@ -33,20 +51,23 @@ app.get("/landing", async (req, res) => {
   } catch (error) {}
 });
 
-// producto
-app.get("/producto:titulo", async (req, res) => {
+// producto LISTA
+app.get("/producto/:titulo", async (req, res) => {
   try {
     const { titulo } = req.params;
-    const consultarProducto = productos.find(
-      (producto) => producto.titulo === titulo
-    );
-    is(consultarProducto);
-    return res.json(movie);
+    const producto = await consultarProducto(titulo);
+
+    if (producto) {
+      res.json(producto);
+    } else {
+      res.status(404).send("Producto no encontrado");
+    }
   } catch (error) {
-    res.status(404).send("Producto no encontrado");
+    console.error(error);
+    res.status(500).send("Error interno del servidor");
   }
 });
-// vender
+// vender LISTA
 app.post("/vender", async (req, res) => {
   try {
     const { titulo, formato, imagen, precio } = req.body;
@@ -58,4 +79,4 @@ app.post("/vender", async (req, res) => {
   }
 });
 
-app.listen(PORT, console.log(`¡Servidor ON en el puerto: ${port}!`));
+app.listen(PORT, console.log(`¡Servidor ON en el puerto: ${PORT}!`));
