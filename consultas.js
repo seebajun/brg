@@ -10,24 +10,42 @@ const pool = new Pool({
   allowExitOnIdle: true,
 });
 
-const crearUsuario = async (email, password) => {
-  const consulta = "INSERT INTO usuarios (email, password) VALUES ($1, $2)";
-  const values = [email, password];
-  await pool.query(consulta, values);
+const obtenerDatosUsuario = async (email) => {
+  const values = [email];
+  const consulta = "SELECT * FROM usuarios WHERE email = $1";
+  const {
+    rows: [usuario],
+    rowCount,
+  } = await pool.query(consulta, values);
+  if (!passwordCorrecta || !rowCount) {
+    throw { code: 404, message: "Email no encontrado" };
+  }
 };
+
+const registrarUsuario = async (usuario) => {
+  let {email, password} = usuario;
+  const passwordEncriptada = bcrypt.hashSync(password);
+  const values = [email, passwordEncriptada]
+  const consulta = "INSERT INTO usuarios values (DEFAULT, $1,$2)";
+  await pool.query(consulta, values)
+}; 
 
 const verificarCredenciales = async (email, password) => {
-  const consulta = "SELECT * FROM usuarios WHERE email = $1 AND password = $2";
-  const values = [email, password];
-  const { rowCount } = await pool.query(consulta, values);
-  if (rowCount === 0)
-    throw {
-      code: 404,
-      message: "No se encontró ningún usuario con estas credenciaels",
-    };
+  const values = [email];
+  const consulta = "SELECT * FROM usuarios WHERE email = $1";
+  const {
+    rows: [usuario],
+    rowCount,
+  } = await pool.query(consulta, values);
+  const { password: passwordEncriptada } = usuario;
+  const passwordCorrecta = bcrypt.compareSync(password, passwordEncriptada);
+
+  if (!passwordCorrecta || !rowCount) {
+    throw { code: 401, message: "Email o contraseña incorrecta" };
+  }
 };
 
-const agregarProducto = async (titulo, formato, imagen, precio) => {
+const vender = async (titulo, formato, imagen, precio) => {
   try {
     const consulta = "INSERT INTO productos values (DEFAULT, $1, $2, $3, $4)";
     const values = [titulo, formato, imagen, precio];
@@ -51,9 +69,9 @@ const consultarProducto = async (titulo) => {
 };
 
 module.exports = {
-  agregarProducto,
-  verificarCredenciales,
-  registrarUsuario,
+  vender,
   consultarProducto,
-  crearUsuario
+  registrarUsuario,
+  obtenerDatosUsuario,
+  verificarCredenciales
 };

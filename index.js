@@ -1,47 +1,68 @@
-const {
-  agregarProducto,
-  verificarCredenciales,
-  consultarProducto,
-  crearUsuario,
-} = require("./consultas.js");
-
 const jwt = require("jsonwebtoken");
 const express = require("express");
 const app = express();
 const cors = require("cors");
 
-PORT = 3000;
+const {
+  vender,
+  consultarProducto,
+  registrarUsuario,
+  obtenerDatosUsuario,
+  verificarCredenciales,
+} = require("./consultas.js");
+
+const {
+  checkearCredenciales,
+  verificarToken
+} = require("./middlewares.js")
+
+const PORT = 3000;
 
 app.use(express.json());
 app.use(cors());
 
-app.get("/", async (req, res) => {
+app.get("/", verificarToken, async (req, res) => {
   try {
-    const { email, password } = req.query;
-    if (!email || !password) {
-      throw {
-        code: 400,
-        message: "El email y la contraseña son obligatorios",
-      };
-    }
-    await verificarCredenciales(email, password);
-    res.send("Usuario creado exitosamente");
+    const token = req.header("Authorization").split("Bearer ")[1];
+    const { email } = jwt.decode(token);
+    const usuario = await obtenerDatosUsuario(email);
+    res.json(usuario);
   } catch (error) {
-    console.error(error);
-    res.status(error.code || 500).send(error.message || "Error interno del servidor");
+    res.status(500).send(error);
+  }
+});
+//login
+app.post("/", checkearCredenciales, async  (req, res) => {
+
+  try {
+    const { email, password } = req.body;
+    await verificarCredenciales(email, password);
+    const token = jwt.sign({ email }, "llaveSecreta");
+    res.send(token);
+  } catch (error) {
+    res.status(500).send(error);
   }
 });
 
-//listo
-app.post("/", async (req, res) => {
+app.get("/registrarse", verificarToken, async (req, res) => {
   try {
-    const { email, password } = req.body;
-    await crearUsuario(email, password);
-    const token = jwt.sign({ email }, "az_AZ");
-    res.send(token);
+    const token = req.header("Authorization").split("Bearer ")[1];
+    const { email } = jwt.decode(token);
+    const usuario = await obtenerDatosUsuario(email);
+    res.json(usuario);
   } catch (error) {
-    console.log(error);
-    res.status(error.code || 500).send(error.message || "Error interno del servidor");
+    res.status(500).send(error);
+  }
+});
+
+app.post("/registrarse", async (req, res) => {
+  try {
+    console.log("hola");
+    const usuario = req.body;
+    await registrarUsuario(usuario);
+    res.send("usuario creado con exitos");
+  } catch (error) {
+    res.status(500).send(error);
   }
 });
 
@@ -71,7 +92,7 @@ app.get("/producto/:titulo", async (req, res) => {
 app.post("/vender", async (req, res) => {
   try {
     const { titulo, formato, imagen, precio } = req.body;
-    await agregarProducto(titulo, formato, imagen, precio);
+    await vender(titulo, formato, imagen, precio);
     res.send("¡Producto agregado!");
   } catch (error) {
     console.error(error);
