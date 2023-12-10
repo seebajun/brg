@@ -11,17 +11,14 @@ const {
   verificarCredenciales,
 } = require("./consultas.js");
 
-const {
-  checkearCredenciales,
-  verificarToken
-} = require("./middlewares.js")
+const { checkearCredenciales, verificarToken } = require("./middlewares.js");
 
-const PORT = 3000;
+const PORT = 3001;
 
 app.use(express.json());
 app.use(cors());
 
-app.get("/", verificarToken, async (req, res) => {
+app.get("/auth", verificarToken, async (req, res) => {
   try {
     const token = req.header("Authorization").split("Bearer ")[1];
     const { email } = jwt.decode(token);
@@ -32,11 +29,14 @@ app.get("/", verificarToken, async (req, res) => {
   }
 });
 //login
-app.post("/", checkearCredenciales, async  (req, res) => {
+app.post("/login", checkearCredenciales, async (req, res) => {
+  res.contentType("application/json");
 
   try {
     const { email, password } = req.body;
-    await verificarCredenciales(email, password);
+    const usuario = await verificarCredenciales(email, password);
+    console.log("hola");
+    console.log(usuario);
     const token = jwt.sign({ email }, "llaveSecreta");
     res.send(token);
   } catch (error) {
@@ -44,25 +44,26 @@ app.post("/", checkearCredenciales, async  (req, res) => {
   }
 });
 
-app.get("/registrarse", verificarToken, async (req, res) => {
+app.get("/landing", verificarToken, async (req, res) => {
   try {
     const token = req.header("Authorization").split("Bearer ")[1];
     const { email } = jwt.decode(token);
     const usuario = await obtenerDatosUsuario(email);
     res.json(usuario);
   } catch (error) {
-    res.status(500).send(error);
+    console.log(error);
+    res.status(500).send("El token no es valido");
   }
 });
 
 app.post("/registrarse", async (req, res) => {
   try {
-    console.log("hola");
     const usuario = req.body;
     await registrarUsuario(usuario);
-    res.send("usuario creado con exitos");
+    res.status(201).send("usuario creado con exito");
   } catch (error) {
-    res.status(500).send(error);
+    console.log(error);
+    res.status(500).send("Ha ocurrido un error al registrar el usuario");
   }
 });
 

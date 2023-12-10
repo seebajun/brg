@@ -1,0 +1,47 @@
+{
+  "endpoints":
+    [
+      {
+        "name": "Login",
+        "method": "POST",
+        "route": "/home",
+        "request": { "payload": { "email": "string", "password": "string" } },
+        "response": { "format": { "email": "string", "token": "string" } }
+      },
+      {
+        "name": "Registrarse",
+        "method": "POST",
+        "route": "/registrarse",
+        "request": { "payload": { "email": "string", "password": "string" } },
+        "response": { "format": { "token": "string", "email": "string" } }
+      },
+      {
+        "name": "Vender",
+        "method": "POST",
+        "route": "/vender",
+        "request":
+          {
+            "payload":
+              {
+                "titulo": "string",
+                "descripcion": "string",
+                "precio": "number",
+                "link": "string"
+              }
+          },
+        "response":
+          {
+            "format":
+              {
+                "payload":
+                  {
+                    "titulo": "string",
+                    "descripcion": "string",
+                    "precio": "number",
+                    "link": "string"
+                  }
+              }
+          }
+      }
+    ]
+}

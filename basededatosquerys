@@ -1,14 +1,35 @@
 create database retrogroove;
 
 -- tabla de productos
-create table productos 
-(id SERIAL primary key, titulo VARCHAR(50), 
-formato VARCHAR(10), imagen VARCHAR(200), precio NUMERIC)
+create table productos (
+    id SERIAL primary key, 
+    titulo VARCHAR(50), 
+    formato VARCHAR(10), 
+    imagen VARCHAR(200), 
+    precio NUMERIC)
 
 -- tabla de usuarios
-create table usuarios (id Serial primary key, email VARCHAR(255), password VARCHAR (255))
+create table usuarios (
+    id Serial primary key, 
+    email VARCHAR(255), 
+    password VARCHAR (255))
+
+    ALTER TABLE IF EXISTS public.usuarios
+    ALTER COLUMN email SET NOT NULL;
+
+ALTER TABLE IF EXISTS public.usuarios
+    ALTER COLUMN password SET NOT NULL;
+
+ALTER TABLE IF EXISTS public.usuarios
+    ADD COLUMN nombre character varying(100) NOT NULL;
+
+ALTER TABLE IF EXISTS public.usuarios
+    ADD COLUMN apellido character varying(100) NOT NULL;
+ALTER TABLE IF EXISTS public.usuarios
+    ADD CONSTRAINT email_unique UNIQUE (email);
 
 -- tabla intermedia, likes de usuarios
-create table usuarios_likes (id_productos INTEGER references productos (id), 
-id_usuarios INTEGER references usuarios (id))
+create table usuarios_likes (
+    id_productos INTEGER references productos (id), 
+    id_usuarios INTEGER references usuarios (id))
 

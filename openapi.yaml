@@ -1,0 +1,101 @@
+openapi: 3.0.0
+info:
+  title: RetroGroove API
+  version: 1.0.0
+
+paths:
+  /home:
+    post:
+      summary: Iniciar sesión
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        "200":
+          description: Éxito al iniciar sesión
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  email:
+                    type: string
+                  token:
+                    type: string
+
+  /registrarse:
+    post:
+      summary: Registrarse
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nombre:
+                  type: string
+                apellido:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        "200":
+          description: Éxito al registrarse
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                  email:
+                    type: string
+
+  /vender:
+    post:
+      summary: Vender un artículo
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                titulo:
+                  type: string
+                descripcion:
+                  type: string
+                precio:
+                  type: number
+                link:
+                  type: string
+      responses:
+        "200":
+          description: Éxito al vender
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  payload:
+                    type: object
+                    properties:
+                      titulo:
+                        type: string
+                      descripcion:
+                        type: string
+                      precio:
+                        type: number
+                      link:
+                        type: string
