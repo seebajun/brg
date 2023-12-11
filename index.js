@@ -70,8 +70,20 @@ app.post("/registrarse", async (req, res) => {
 // landing
 app.get("/landing", async (req, res) => {
   try {
-  } catch (error) {}
+    const result = await pool.query('SELECT * FROM productos');
+    const data = result.rows;
+
+    res.json(data);
+  } catch (error) {
+    console.error('Error al obtener datos de la base de datos', error);
+    res.status(500).send('Error interno del servidor');
+  }
 });
+
+//perfil
+app.get("/perfil", async (req, res) => {
+  
+})
 
 // producto LISTA
 app.get("/producto/:titulo", async (req, res) => {
