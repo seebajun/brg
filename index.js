@@ -13,7 +13,7 @@ const {
 
 const { checkearCredenciales, verificarToken } = require("./middlewares.js");
 
-const PORT = 3001;
+const PORT = 3000;
 
 app.use(express.json());
 app.use(cors());
@@ -110,7 +110,7 @@ app.post("/vender", async (req, res) => {
   try {
     const { titulo, formato, imagen, precio } = req.body;
     await vender(titulo, formato, imagen, precio);
-    res.send("¡Producto agregado!");
+    res.status(201).send("¡Producto agregado!");
   } catch (error) {
     console.error(error);
     res.status(500).send("Error interno del servidor");
@@ -118,3 +118,5 @@ app.post("/vender", async (req, res) => {
 });
 
 app.listen(PORT, console.log(`¡Servidor ON en el puerto: ${PORT}!`));
+
+module.exports = app

@@ -3,8 +3,8 @@ const bcrypt = require("bcryptjs");
 
 const pool = new Pool({
   host: "localhost",
-  user: "retrogroove",
-  password: "retro1234",
+  user: "postgres",
+  password: "postgres",
   database: "retrogroove",
   port: 5432,
   allowExitOnIdle: true,
@@ -52,7 +52,7 @@ const verificarCredenciales = async (email, password) => {
 
 const vender = async (titulo, formato, imagen, precio) => {
   try {
-    const consulta = "INSERT INTO productos values (DEFAULT, $1, $2, $3, $4)";
+    const consulta = "INSERT INTO productos (titulo, formato, imagen, precio) VALUES ($1, $2, $3, $4)";
     const values = [titulo, formato, imagen, precio];
     const result = await pool.query(consulta, values);
     console.log("¡Ya se está vendiendo!" + result.rowCount);

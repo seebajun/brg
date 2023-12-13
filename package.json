@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "jest"
+    "test": "jest --forceExit"
   },
   "keywords": [],
   "author": "",
@@ -17,5 +17,8 @@
     "nodemon": "^3.0.2",
     "pg": "^8.11.3"
   },
-  "description": ""
+  "description": "",
+  "devDependencies": {
+    "supertest": "^6.3.3"
+  }
 }
