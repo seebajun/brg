@@ -67,13 +67,11 @@ app.post("/registrarse", async (req, res) => {
 
 app.get("/landing", async (req, res) => {
   try {
-    const result = await pool.query('SELECT * FROM productos');
-    const data = result.rows;
-
-    res.json(data);
+    const productos = await consultarProducto();
+    res.json(productos);
   } catch (error) {
-    console.error('Error al obtener datos de la base de datos', error);
-    res.status(500).send('Error interno del servidor');
+    console.error(error);
+    res.status(500).send("Error interno del servidor");
   }
 });
 
