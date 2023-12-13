@@ -28,16 +28,14 @@ app.get("/auth", verificarToken, async (req, res) => {
     res.status(500).send(error);
   }
 });
-//login
-app.post("/login", checkearCredenciales, async (req, res) => {
-  res.contentType("application/json");
 
+app.post("/login", checkearCredenciales, async (req, res) => {
   try {
     const { email, password } = req.body;
     const usuario = await verificarCredenciales(email, password);
-    console.log("hola");
-    console.log(usuario);
+    console.log("Usuario:", usuario);
     const token = jwt.sign({ email }, "llaveSecreta");
+    console.log("Token:", token);
     res.send(token);
   } catch (error) {
     res.status(500).send(error);
@@ -67,7 +65,6 @@ app.post("/registrarse", async (req, res) => {
   }
 });
 
-// landing
 app.get("/landing", async (req, res) => {
   try {
     const result = await pool.query('SELECT * FROM productos');
@@ -80,12 +77,16 @@ app.get("/landing", async (req, res) => {
   }
 });
 
-//perfil
 app.get("/perfil", async (req, res) => {
-  
-})
+  try {
+    const usuario = await obtenerDatosUsuario();
+    res.json(usuario);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Error interno del servidor");
+  } 
+});
 
-// producto LISTA
 app.get("/producto/:titulo", async (req, res) => {
   try {
     const { titulo } = req.params;
@@ -101,12 +102,25 @@ app.get("/producto/:titulo", async (req, res) => {
     res.status(500).send("Error interno del servidor");
   }
 });
-// vender LISTA
-app.post("/vender", async (req, res) => {
+
+app.post("/vender", verificarToken, async (req, res) => {
   try {
     const { titulo, formato, imagen, precio } = req.body;
-    await vender(titulo, formato, imagen, precio);
-    res.status(201).send("¡Producto agregado!");
+
+    const token = req.header("Authorization").split("Bearer ")[1];
+    const email = jwt.decode(token).email;
+
+    try {
+      const usuario = await obtenerDatosUsuario(email);
+      const idUsuario = usuario.id;
+
+      await vender(idUsuario, titulo, formato, imagen, precio);
+
+      res.status(201).send("¡Producto agregado!");
+    } catch (errorObtenerUsuario) {
+      console.error(errorObtenerUsuario);
+      res.status(404).send("Usuario no encontrado");
+    }
   } catch (error) {
     console.error(error);
     res.status(500).send("Error interno del servidor");

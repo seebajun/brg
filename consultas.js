@@ -17,10 +17,14 @@ const obtenerDatosUsuario = async (email) => {
     rows: [usuario],
     rowCount,
   } = await pool.query(consulta, values);
-  if (!passwordCorrecta || !rowCount) {
+
+  if (!usuario || !rowCount) {
     throw { code: 404, message: "Email no encontrado" };
   }
+
+  return usuario;
 };
+
 
 const registrarUsuario = async (usuario) => {
   let { nombre, apellido, email, password } = usuario;
@@ -32,30 +36,33 @@ const registrarUsuario = async (usuario) => {
 };
 
 const verificarCredenciales = async (email, password) => {
-  console.log("hola");
   const values = [email];
   const consulta = "SELECT * FROM usuarios WHERE email = $1";
   const response = await pool.query(consulta, values);
-  console.log("hola1", response);
+  console.log(response);
   if (response.rowCount <= 0) {
     throw new Error("Email o password incorrecta");
   }
-
-  const usuario = response.rows;
-
-  if (bcrypt.compareSync(password, usuario.password)) {
+  const usuario = response.rows[0];
+  if (!bcrypt.compareSync(password, usuario.password)) {
     throw new Error("Email o password incorrecta");
   }
 
   return usuario;
 };
 
-const vender = async (titulo, formato, imagen, precio) => {
+const vender = async (idUsuario, titulo, formato, imagen, precio) => {
   try {
-    const consulta = "INSERT INTO productos (titulo, formato, imagen, precio) VALUES ($1, $2, $3, $4)";
-    const values = [titulo, formato, imagen, precio];
-    const result = await pool.query(consulta, values);
-    console.log("¡Ya se está vendiendo!" + result.rowCount);
+    const consultaProducto = "INSERT INTO productos (id_usuario, titulo, formato, imagen, precio, vendido) VALUES ($1, $2, $3, $4, $5, false) RETURNING id";
+    const valuesProducto = [idUsuario, titulo, formato, imagen, precio];
+    const resultProducto = await pool.query(consultaProducto, valuesProducto);
+
+    if (resultProducto.rows[0]) {
+      const idProducto = resultProducto.rows[0].id;
+      console.log("¡Se agrega producto con éxito!");
+    } else {
+      console.error("Error al agregar producto: Resultado no tiene filas");
+    }
   } catch (error) {
     console.error("Error al agregar producto:", error);
     throw error;
