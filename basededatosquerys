@@ -3,10 +3,13 @@ create database retrogroove;
 -- tabla de productos
 create table productos (
     id SERIAL primary key, 
-    titulo VARCHAR(50), 
-    formato VARCHAR(10), 
-    imagen VARCHAR(200), 
-    precio NUMERIC)
+    id_usuario INTEGER REFERENCES usuarios(id), 
+    titulo VARCHAR(50),
+    formato VARCHAR(10),
+    imagen VARCHAR(200),
+    precio NUMERIC,
+    vendido BOOLEAN DEFAULT false)
+
 
 -- tabla de usuarios
 create table usuarios (

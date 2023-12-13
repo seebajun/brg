@@ -10,16 +10,19 @@ const checkearCredenciales = (req, res, next) => {
   next();
 };
 const verificarToken = (req, res, next) => {
-  if (req.header("Authorization")) {
-    const token = req.header("Authorization").split("Bearer ")[1];
-    if (!token) {
-      return res.status(401).send("Usuario no autenticado");
-    }
+  const token = req.header("Authorization")?.split("Bearer ")[1];
 
-    const tokenValido = jwt.verify(token, "llaveSecreta");
-    if (!tokenValido) return res.status(401).send("Usuario no autenticado");
+  if (!token) {
+    return res.status(401).send("Usuario no autenticado");
   }
-  next();
+
+  try {
+    const decoded = jwt.verify(token, "llaveSecreta");
+    req.usuario = decoded;
+    next();
+  } catch (error) {
+    return res.status(401).send("Usuario no autenticado");
+  }
 };
 
 module.exports = { checkearCredenciales, verificarToken };

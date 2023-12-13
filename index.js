@@ -85,7 +85,7 @@ app.get("/perfil", async (req, res) => {
   } 
 });
 
-app.get("/producto/:titulo", async (req, res) => {
+app.get("/producto/:titulo", verificarToken, async (req, res) => {
   try {
     const { titulo } = req.params;
     const producto = await consultarProducto(titulo);
