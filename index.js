@@ -81,6 +81,9 @@ app.get("/perfil", verificarToken, async (req, res) => {
     const token = req.header("Authorization").split("Bearer ")[1];
     const { email } = jwt.decode(token);
     const usuario = await obtenerDatosUsuario(email);
+    if (usuario) {
+      delete usuario.password;
+    }
     res.json(usuario);
   } catch (error) {
     console.error(error);
