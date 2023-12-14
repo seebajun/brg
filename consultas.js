@@ -4,7 +4,7 @@ const bcrypt = require("bcryptjs");
 const pool = new Pool({
   host: "localhost",
   user: "postgres",
-  password: "postgres",
+  password: "2833",
   database: "retrogroove",
   port: 5432,
   allowExitOnIdle: true,
@@ -79,10 +79,20 @@ const consultarProducto = async (titulo) => {
   }
 };
 
+const consultarProductos = async () => {
+  const consulta = "SELECT * FROM productos";
+  const result = await pool.query(consulta);
+
+  if (result.rows.length > 0) {
+    return result.rows;
+  }
+}
+
 module.exports = {
   vender,
   consultarProducto,
   registrarUsuario,
   obtenerDatosUsuario,
   verificarCredenciales,
+  consultarProductos
 };
