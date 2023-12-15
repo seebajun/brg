@@ -10,6 +10,7 @@ const {
   obtenerDatosUsuario,
   verificarCredenciales,
   consultarProductos,
+  consultarLikesPorUsuario
 } = require("./consultas.js");
 
 const { checkearCredenciales, verificarToken } = require("./middlewares.js");
@@ -35,7 +36,7 @@ app.post("/login", checkearCredenciales, async (req, res) => {
     const { email, password } = req.body;
     const usuario = await verificarCredenciales(email, password);
     console.log("Usuario:", usuario);
-    const token = jwt.sign({ email }, "llaveSecreta", {expiresIn: "15m"});
+    const token = jwt.sign({ email }, "llaveSecreta", {expiresIn: "1h"});
     console.log("Token:", token);
     res.send(token);
   } catch (error) {
@@ -110,7 +111,6 @@ app.get("/producto/:titulo", verificarToken, async (req, res) => {
 app.post("/vender", verificarToken, async (req, res) => {
   try {
     const { titulo, descripcion, formato, imagen, precio } = req.body;
-
     const token = req.header("Authorization").split("Bearer ")[1];
     const email = jwt.decode(token).email;
 
@@ -130,6 +130,26 @@ app.post("/vender", verificarToken, async (req, res) => {
     res.status(500).send("Error interno del servidor");
   }
 });
+
+app.get("/favoritos", verificarToken, async (req, res) => {
+  try {
+    const token = req.header("Authorization").split("Bearer ")[1];
+    const email = jwt.decode(token).email;
+    try {
+      const usuario = await obtenerDatosUsuario(email);
+      const idUsuario = usuario.id;
+      const likesUsuario = await consultarLikesPorUsuario(idUsuario);
+      res.json(likesUsuario);
+    } catch (errorObtenerUsuario) {
+      console.error(errorObtenerUsuario);
+      res.status(404).send("Usuario no encontrado");
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Error interno del servidor");
+  }
+});
+
 
 app.listen(PORT, console.log(`¡Servidor ON en el puerto: ${PORT}!`));
 

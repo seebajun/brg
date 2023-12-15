@@ -25,7 +25,6 @@ const obtenerDatosUsuario = async (email) => {
   return usuario;
 };
 
-
 const registrarUsuario = async (usuario) => {
   let { nombre, apellido, email, password } = usuario;
   const passwordEncriptada = bcrypt.hashSync(password);
@@ -88,11 +87,22 @@ const consultarProductos = async () => {
   }
 }
 
+const consultarLikesPorUsuario = async (idUsuario) => {
+  const consulta = "SELECT * FROM usuarios_likes WHERE id_usuarios = $1";
+  const values = [idUsuario];
+  const result = await pool.query(consulta, values);
+  return result.rows;
+};
+
+
+
+
 module.exports = {
   vender,
   consultarProducto,
   registrarUsuario,
   obtenerDatosUsuario,
   verificarCredenciales,
-  consultarProductos
+  consultarProductos,
+  consultarLikesPorUsuario
 };
