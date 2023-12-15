@@ -9,6 +9,7 @@ const {
   registrarUsuario,
   obtenerDatosUsuario,
   verificarCredenciales,
+  consultarProductos,
 } = require("./consultas.js");
 
 const { checkearCredenciales, verificarToken } = require("./middlewares.js");
@@ -65,9 +66,9 @@ app.post("/registrarse", async (req, res) => {
   }
 });
 
-app.get("/landing", async (req, res) => {
+app.get("/landing2", verificarToken, async (req, res) => {
   try {
-    const productos = await consultarProducto();
+    const productos = await consultarProductos();
     res.json(productos);
   } catch (error) {
     console.error(error);
@@ -75,15 +76,20 @@ app.get("/landing", async (req, res) => {
   }
 });
 
-app.get("/perfil", async (req, res) => {
+app.get("/perfil", verificarToken, async (req, res) => {
   try {
-    const usuario = await obtenerDatosUsuario();
+    const token = req.header("Authorization").split("Bearer ")[1];
+    const { email } = jwt.decode(token);
+    const usuario = await obtenerDatosUsuario(email);
+    if (usuario) {
+      delete usuario.password;
+    }
     res.json(usuario);
   } catch (error) {
     console.error(error);
     res.status(500).send("Error interno del servidor");
-  } 
-});
+  }
+});  
 
 app.get("/producto/:titulo", verificarToken, async (req, res) => {
   try {
