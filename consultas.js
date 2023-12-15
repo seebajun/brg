@@ -51,10 +51,10 @@ const verificarCredenciales = async (email, password) => {
   return usuario;
 };
 
-const vender = async (idUsuario, titulo, formato, imagen, precio) => {
+const vender = async (idUsuario, titulo, descripcion, formato, imagen, precio) => {
   try {
-    const consultaProducto = "INSERT INTO productos (id_usuario, titulo, formato, imagen, precio, vendido) VALUES ($1, $2, $3, $4, $5, false) RETURNING id";
-    const valuesProducto = [idUsuario, titulo, formato, imagen, precio];
+    const consultaProducto = "INSERT INTO productos (id_usuario, titulo, descripcion, formato, imagen, precio, vendido) VALUES ($1, $2, $3, $4, $5, $6, false) RETURNING id";
+    const valuesProducto = [idUsuario, titulo, descripcion, formato, imagen, precio];
     const resultProducto = await pool.query(consultaProducto, valuesProducto);
 
     if (resultProducto.rows[0]) {

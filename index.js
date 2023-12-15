@@ -13,7 +13,7 @@ const {
 
 const { checkearCredenciales, verificarToken } = require("./middlewares.js");
 
-const PORT = 3000;
+const PORT = 2999;
 
 app.use(express.json());
 app.use(cors());
@@ -34,7 +34,7 @@ app.post("/login", checkearCredenciales, async (req, res) => {
     const { email, password } = req.body;
     const usuario = await verificarCredenciales(email, password);
     console.log("Usuario:", usuario);
-    const token = jwt.sign({ email }, "llaveSecreta");
+    const token = jwt.sign({ email }, "llaveSecreta", {expiresIn: "15m"});
     console.log("Token:", token);
     res.send(token);
   } catch (error) {
@@ -103,7 +103,7 @@ app.get("/producto/:titulo", verificarToken, async (req, res) => {
 
 app.post("/vender", verificarToken, async (req, res) => {
   try {
-    const { titulo, formato, imagen, precio } = req.body;
+    const { titulo, descripcion, formato, imagen, precio } = req.body;
 
     const token = req.header("Authorization").split("Bearer ")[1];
     const email = jwt.decode(token).email;
@@ -112,7 +112,7 @@ app.post("/vender", verificarToken, async (req, res) => {
       const usuario = await obtenerDatosUsuario(email);
       const idUsuario = usuario.id;
 
-      await vender(idUsuario, titulo, formato, imagen, precio);
+      await vender(idUsuario, titulo, descripcion, formato, imagen, precio);
 
       res.status(201).send("¡Producto agregado!");
     } catch (errorObtenerUsuario) {

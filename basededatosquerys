@@ -2,14 +2,27 @@ create database retrogroove;
 
 -- tabla de productos
 create table productos (
-    id SERIAL primary key, 
-    id_usuario INTEGER REFERENCES usuarios(id), 
-    titulo VARCHAR(50),
-    formato VARCHAR(10),
-    imagen VARCHAR(200),
-    precio NUMERIC,
-    vendido BOOLEAN DEFAULT false)
+id SERIAL primary key, 
+id_usuario INTEGER REFERENCES usuarios(id), 
+titulo VARCHAR(50), 
+descripcion Varchar(255), 
+formato VARCHAR(10),
+imagen VARCHAR(255), 
+precio NUMERIC, 
+vendido BOOLEAN DEFAULT false)
 
+INSERT INTO productos (id, id_usuario, titulo, descripcion, formato, imagen, precio)
+VALUES
+  (1, 1, 'Producto1', 'Descripción del Producto 1.', 'Vinilo', 'https://dojiw2m9tvv09.cloudfront.net/41657/product/X_1850117-28048004736.jpg?48&time=1701129528', 12000),
+  (2, 2, 'Producto2', 'Descripción del Producto 2.', 'Vinilo', 'https://dojiw2m9tvv09.cloudfront.net/41657/product/X_34054240982.jpg?48&time=1701129561', 28000),
+  (3, 3, 'Producto3', 'Descripción del Producto 3.', 'CDs', 'https://www.metalkingdom.net/album-photo/2018/03/1229-Necrophagist-Epitaph.jpg', 39000),
+  (4, 1, 'Producto4', 'Descripción del Producto 4.', 'CDs', 'https://www.metalkingdom.net/album-photo/2020/12/26047-necrophagist-onset-of-putrefaction-2.jpg', 49000),
+  (5, 2, 'Producto5', 'Descripción del Producto 5.', 'Cassete', 'https://img.kleinanzeigen.de/api/v1/prod-ads/images/2e/2eb70d2a-63ec-4d61-96cb-7dc8a92c1ab0?rule=$_20.JPG', 9900),
+  (6, 3, 'Producto6', 'Descripción del Producto 6.', 'CDs', 'https://popsike.io/pix/20210326/133705929425.jpg', 19990),
+  (7, 2, 'Producto7', 'Descripción del Producto 7.', 'CDs', 'https://i.ebayimg.com/thumbs/images/g/n4MAAOSw9khhL9JI/s-l640.jpg', 29990),
+  (8, 3, 'Producto8', 'Descripción del Producto 8.', 'Vinilo', 'https://tshirtslayer.com/files-tshirt/styles/shirtview/public/user-30412/tss--2ed09602d8d0ca40a841a581e27db928.jpg', 39990),
+  (9, 2, 'Producto9', 'Descripción del Producto 9.', 'Vinilo', 'https://i.redd.it/cra6ut43bow81.jpg', 49990),
+  (10, 3, 'Producto10', 'Descripción del Producto 10.', 'Cassete', 'https://musicjungle.cl/wp-content/uploads/2020/12/Metallica-Master-Of-Puppets-Cassette.jpg', 19990);
 
 -- tabla de usuarios
 create table usuarios (
