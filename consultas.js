@@ -4,7 +4,7 @@ const bcrypt = require("bcryptjs");
 const pool = new Pool({
   host: "localhost",
   user: "postgres",
-  password: "2833",
+  password: "postgres",
   database: "retrogroove",
   port: 5432,
   allowExitOnIdle: true,
@@ -88,14 +88,12 @@ const consultarProductos = async () => {
 }
 
 const consultarLikesPorUsuario = async (idUsuario) => {
-  const consulta = "SELECT * FROM usuarios_likes WHERE id_usuarios = $1";
+  const consulta =
+    "SELECT ul.id_productos, p.titulo, p.descripcion, p.formato, p.imagen, p.precio FROM usuarios_likes ul JOIN productos p ON ul.id_productos = p.id WHERE ul.id_usuarios = $1";
   const values = [idUsuario];
   const result = await pool.query(consulta, values);
   return result.rows;
 };
-
-
-
 
 module.exports = {
   vender,
