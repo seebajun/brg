@@ -95,6 +95,35 @@ const consultarLikesPorUsuario = async (idUsuario) => {
   return result.rows;
 };
 
+const eliminarFavorito = async (idUsuario, idProducto) => {
+  const consulta =
+    "DELETE FROM usuarios_likes WHERE id_usuarios = $1 AND id_productos = $2";
+  const values = [idUsuario, idProducto];
+
+  try {
+    const result = await pool.query(consulta, values);
+    return result.rowCount > 0;
+  } catch (error) {
+    console.error("Error al eliminar favorito:", error);
+    throw error;
+  }
+};
+
+const agregarProductoAFavoritos = async (idUsuario, idProducto) => {
+  const consulta =
+    "INSERT INTO usuarios_likes (id_usuarios, id_productos) VALUES ($1, $2)";
+  const values = [idUsuario, idProducto];
+
+  try {
+    const result = await pool.query(consulta, values);
+    return result.rowCount > 0;
+  } catch (error) {
+    console.error("Error al agregar producto a favoritos:", error);
+    throw error;
+  }
+};
+
+
 module.exports = {
   vender,
   consultarProducto,
@@ -102,5 +131,7 @@ module.exports = {
   obtenerDatosUsuario,
   verificarCredenciales,
   consultarProductos,
-  consultarLikesPorUsuario
+  consultarLikesPorUsuario,
+  eliminarFavorito,
+  agregarProductoAFavoritos
 };

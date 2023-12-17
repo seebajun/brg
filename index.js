@@ -10,7 +10,9 @@ const {
   obtenerDatosUsuario,
   verificarCredenciales,
   consultarProductos,
-  consultarLikesPorUsuario
+  consultarLikesPorUsuario,
+  eliminarFavorito,
+  agregarProductoAFavoritos,
 } = require("./consultas.js");
 
 const { checkearCredenciales, verificarToken } = require("./middlewares.js");
@@ -36,7 +38,7 @@ app.post("/login", checkearCredenciales, async (req, res) => {
     const { email, password } = req.body;
     const usuario = await verificarCredenciales(email, password);
     console.log("Usuario:", usuario);
-    const token = jwt.sign({ email }, "llaveSecreta", {expiresIn: "1h"});
+    const token = jwt.sign({ email }, "llaveSecreta", { expiresIn: "1h" });
     console.log("Token:", token);
     res.send(token);
   } catch (error) {
@@ -90,7 +92,7 @@ app.get("/perfil", verificarToken, async (req, res) => {
     console.error(error);
     res.status(500).send("Error interno del servidor");
   }
-});  
+});
 
 app.get("/producto/:titulo", verificarToken, async (req, res) => {
   try {
@@ -150,7 +152,52 @@ app.get("/favoritos", verificarToken, async (req, res) => {
   }
 });
 
+app.delete("/favoritos/:idProducto", verificarToken, async (req, res) => {
+  try {
+    const token = req.header("Authorization").split("Bearer ")[1];
+    const email = jwt.decode(token).email;
+    const usuario = await obtenerDatosUsuario(email);
+    const idUsuario = usuario.id;
+    const idProducto = req.params.idProducto;
+    const eliminado = await eliminarFavorito(idUsuario, idProducto);
+
+    if (eliminado) {
+      res.status(200).send("Favorito eliminado correctamente");
+    } else {
+      res.status(404).send("Favorito no encontrado para el usuario");
+    }
+  } catch (error) {
+    console.error(error);
+
+    if (error.code === "23503") {
+      res.status(404).send("Producto no encontrado");
+    } else {
+      res.status(500).send("Error interno del servidor");
+    }
+  }
+});
+
+app.post("/favoritos/:idProducto", verificarToken, async (req, res) => {
+  try {
+    const token = req.header("Authorization").split("Bearer ")[1];
+    const email = jwt.decode(token).email;
+    const usuario = await obtenerDatosUsuario(email);
+    const idUsuario = usuario.id;
+    const idProducto = req.params.idProducto;
+
+    const agregado = await agregarProductoAFavoritos(idUsuario, idProducto);
+
+    if (agregado) {
+      res.status(201).send("Producto agregado a favoritos correctamente");
+    } else {
+      res.status(500).send("Error al agregar producto a favoritos");
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Error interno del servidor");
+  }
+});
 
 app.listen(PORT, console.log(`¡Servidor ON en el puerto: ${PORT}!`));
 
-module.exports = app
+module.exports = app;
