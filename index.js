@@ -29,8 +29,7 @@ app.get("/auth", verificarToken, async (req, res) => {
     const usuario = await obtenerDatosUsuario(email);
     res.json(usuario);
   } catch (error) {
-    res.status(500).send(error);
-  }
+    res.status(500).send({ error: "Error al procesar la solicitud" });  }
 });
 
 app.post("/login", checkearCredenciales, async (req, res) => {
@@ -46,18 +45,6 @@ app.post("/login", checkearCredenciales, async (req, res) => {
   }
 });
 
-app.get("/landing", verificarToken, async (req, res) => {
-  try {
-    const token = req.header("Authorization").split("Bearer ")[1];
-    const { email } = jwt.decode(token);
-    const usuario = await obtenerDatosUsuario(email);
-    res.json(usuario);
-  } catch (error) {
-    console.log(error);
-    res.status(500).send("El token no es valido");
-  }
-});
-
 app.post("/registrarse", async (req, res) => {
   try {
     const usuario = req.body;
@@ -69,7 +56,7 @@ app.post("/registrarse", async (req, res) => {
   }
 });
 
-app.get("/landing2", verificarToken, async (req, res) => {
+app.get("/landing", verificarToken, async (req, res) => {
   try {
     const productos = await consultarProductos();
     res.json(productos);
@@ -146,6 +133,18 @@ app.get("/favoritos", verificarToken, async (req, res) => {
       console.error(errorObtenerUsuario);
       res.status(404).send("Usuario no encontrado");
     }
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Error interno del servidor");
+  }
+});
+
+app.get("/favoritos/:idProducto", verificarToken, async (req, res) => {
+  try {
+    const idProducto = req.params.idProducto;
+    // Agrega lógica para obtener los favoritos por ID de producto
+    const likesProducto = await consultarLikesPorUsuario(idProducto);
+    res.json(likesProducto);
   } catch (error) {
     console.error(error);
     res.status(500).send("Error interno del servidor");
