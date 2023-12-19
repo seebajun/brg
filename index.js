@@ -12,6 +12,7 @@ const {
   consultarProductos,
   consultarLikesPorUsuario,
   eliminarFavorito,
+  borrarProducto,
   agregarProductoAFavoritos,
   consultarProductosPorUsuario,
 } = require("./consultas.js");
@@ -174,6 +175,22 @@ app.delete("/favoritos/:idProducto", verificarToken, async (req, res) => {
     } else {
       res.status(500).send("Error interno del servidor");
     }
+  }
+});
+
+app.delete("/producto/:idProducto", verificarToken, async (req, res) => {
+  try {
+    const idProducto = req.params.idProducto;
+    const eliminado = await borrarProducto(idProducto);
+
+    if (eliminado) {
+      res.status(200).send("Producto eliminado correctamente");
+    } else {
+      res.status(404).send("Producto no encontrado");
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Error interno del servidor" + error);
   }
 });
 

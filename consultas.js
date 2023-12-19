@@ -4,7 +4,7 @@ const bcrypt = require("bcryptjs");
 const pool = new Pool({
   host: "localhost",
   user: "postgres",
-  password: "postgres",
+  password: "2833",
   database: "retrogroove",
   port: 5432,
   allowExitOnIdle: true,
@@ -109,6 +109,19 @@ const eliminarFavorito = async (idUsuario, idProducto) => {
   }
 };
 
+const borrarProducto = async (idProducto) => {
+  const consulta = "DELETE FROM productos WHERE id = $1";
+  const values = [idProducto];
+
+  try {
+    const result = await pool.query(consulta, values);
+    return result.rowCount > 0;
+  } catch (error) {
+    console.error("Error al eliminar producto:", error);
+    throw error;
+  }
+};
+
 const agregarProductoAFavoritos = async (idUsuario, idProducto) => {
   const consulta =
     "INSERT INTO usuarios_likes (id_usuarios, id_productos) VALUES ($1, $2)";
@@ -142,6 +155,7 @@ module.exports = {
   consultarProductos,
   consultarLikesPorUsuario,
   eliminarFavorito,
+  borrarProducto,
   agregarProductoAFavoritos,
   consultarProductosPorUsuario
 };
