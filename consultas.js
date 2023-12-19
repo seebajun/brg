@@ -123,6 +123,15 @@ const agregarProductoAFavoritos = async (idUsuario, idProducto) => {
   }
 };
 
+const consultarProductosPorUsuario = async (idUsuario) => {
+  const consulta = `
+    SELECT *
+      FROM productos
+     WHERE id_usuario = $1`;
+  const values = [idUsuario];
+  const result = await pool.query(consulta, values);
+  return result.rows;
+};
 
 module.exports = {
   vender,
@@ -133,5 +142,6 @@ module.exports = {
   consultarProductos,
   consultarLikesPorUsuario,
   eliminarFavorito,
-  agregarProductoAFavoritos
+  agregarProductoAFavoritos,
+  consultarProductosPorUsuario
 };

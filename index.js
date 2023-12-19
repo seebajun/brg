@@ -13,6 +13,7 @@ const {
   consultarLikesPorUsuario,
   eliminarFavorito,
   agregarProductoAFavoritos,
+  consultarProductosPorUsuario,
 } = require("./consultas.js");
 
 const { checkearCredenciales, verificarToken } = require("./middlewares.js");
@@ -194,6 +195,26 @@ app.post("/favoritos/:idProducto", verificarToken, async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).send("Error interno del servidor");
+  }
+});
+
+app.get('/publicaciones', verificarToken, async (req, res) => {
+  try {
+    const token = req.header('Authorization').split('Bearer ')[1];
+    const email = jwt.decode(token).email;
+    
+    try {
+      const usuario = await obtenerDatosUsuario(email);
+      const idUsuario = usuario.id;
+      const postUsuario = await consultarProductosPorUsuario(idUsuario); // Asegúrate de tener esta función definida
+      res.json(postUsuario);
+    } catch (errorObtenerUsuario) {
+      console.error(errorObtenerUsuario);
+      res.status(404).send('Usuario no encontrado');
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Error interno del servidor');
   }
 });
 
