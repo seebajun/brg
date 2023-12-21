@@ -15,6 +15,9 @@ const {
   borrarProducto,
   agregarProductoAFavoritos,
   consultarProductosPorUsuario,
+  consultarCarritoPorUsuario,
+  agregarProductoAlCarrito,
+  eliminarProductoDelCarrito,
 } = require("./consultas.js");
 
 const { checkearCredenciales, verificarToken } = require("./middlewares.js");
@@ -144,7 +147,6 @@ app.get("/favoritos", verificarToken, async (req, res) => {
 app.get("/favoritos/:idProducto", verificarToken, async (req, res) => {
   try {
     const idProducto = req.params.idProducto;
-    // Agrega lógica para obtener los favoritos por ID de producto
     const likesProducto = await consultarLikesPorUsuario(idProducto);
     res.json(likesProducto);
   } catch (error) {
@@ -232,6 +234,73 @@ app.get('/publicaciones', verificarToken, async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).send('Error interno del servidor');
+  }
+});
+
+app.get("/carrito", verificarToken, async (req, res) => {
+  try {
+    const token = req.header("Authorization").split("Bearer ")[1];
+    const email = jwt.decode(token).email;
+    
+    try {
+      const usuario = await obtenerDatosUsuario(email);
+      const idUsuario = usuario.id;
+      const carritoUsuario = await consultarCarritoPorUsuario(idUsuario);
+      res.json(carritoUsuario);
+    } catch (errorObtenerCarrito) {
+      console.error(errorObtenerCarrito);
+      res.status(404).send("Carrito no encontrado");
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Error interno del servidor");
+  }
+});
+
+app.post("/carrito/:idProducto", verificarToken, async (req, res) => {
+  try {
+    const token = req.header("Authorization").split("Bearer ")[1];
+    const email = jwt.decode(token).email;
+    const usuario = await obtenerDatosUsuario(email);
+    const idUsuario = usuario.id;
+    const idProducto = req.params.idProducto;
+
+    const agregado = await agregarProductoAlCarrito(idUsuario, idProducto);
+
+    if (agregado) {
+      res.status(201).send("Producto agregado al carrito correctamente");
+    } else {
+      res.status(500).send("Error al agregar producto al carrito");
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Error interno del servidor");
+  }
+});
+
+app.delete("/carrito/:idProducto", verificarToken, async (req, res) => {
+  try {
+    const token = req.header("Authorization").split("Bearer ")[1];
+    const email = jwt.decode(token).email;
+    const usuario = await obtenerDatosUsuario(email);
+    const idUsuario = usuario.id;
+    const idProducto = req.params.idProducto;
+
+    const eliminado = await eliminarProductoDelCarrito(idUsuario, idProducto);
+
+    if (eliminado) {
+      res.status(200).send("Producto eliminado del carrito correctamente");
+    } else {
+      res.status(404).send("Producto no encontrado en el carrito");
+    }
+  } catch (error) {
+    console.error(error);
+
+    if (error.code === "23503") {
+      res.status(404).send("Producto no encontrado");
+    } else {
+      res.status(500).send("Error interno del servidor");
+    }
   }
 });
 

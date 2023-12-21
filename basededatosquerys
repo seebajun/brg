@@ -1,5 +1,4 @@
 create database retrogroove;
-
 -- tabla de productos
 create table productos (
 id SERIAL primary key, 
@@ -23,31 +22,25 @@ VALUES
   (8, 3, 'Producto8', 'Descripción del Producto 8.', 'Vinilo', 'https://tshirtslayer.com/files-tshirt/styles/shirtview/public/user-30412/tss--2ed09602d8d0ca40a841a581e27db928.jpg', 39990),
   (9, 2, 'Producto9', 'Descripción del Producto 9.', 'Vinilo', 'https://i.redd.it/cra6ut43bow81.jpg', 49990),
   (10, 3, 'Producto10', 'Descripción del Producto 10.', 'Cassete', 'https://musicjungle.cl/wp-content/uploads/2020/12/Metallica-Master-Of-Puppets-Cassette.jpg', 19990);
-
 -- tabla de usuarios
-create table usuarios (
-    id Serial primary key, 
-    email VARCHAR(255), 
-    password VARCHAR (255))
+CREATE TABLE usuarios (
+    id SERIAL PRIMARY KEY, 
+    email VARCHAR(255) NOT NULL UNIQUE, 
+    password VARCHAR(255) NOT NULL,
+    nombre VARCHAR(100) NOT NULL,
+    apellido VARCHAR(100) NOT NULL
+);
 
-    ALTER TABLE IF EXISTS public.usuarios
-    ALTER COLUMN email SET NOT NULL;
-
-ALTER TABLE IF EXISTS public.usuarios
-    ALTER COLUMN password SET NOT NULL;
-
-ALTER TABLE IF EXISTS public.usuarios
-    ADD COLUMN nombre character varying(100) NOT NULL;
-
-ALTER TABLE IF EXISTS public.usuarios
-    ADD COLUMN apellido character varying(100) NOT NULL;
-ALTER TABLE IF EXISTS public.usuarios
-    ADD CONSTRAINT email_unique UNIQUE (email);
+INSERT INTO usuarios (email, password, nombre, apellido) VALUES
+  ('hazel@retrogroove.com', '123', 'Hazel', 'Guerra'),
+  ('juan@retrogroove.com', '123', 'Juan', 'Aros'),
+  ('guillermo@retrogroove.com', '123', 'Guillermo', 'Palma');
 
 -- tabla intermedia, likes de usuarios
--- tabla intermedia, likes de usuarios
-create table usuarios_likes (id_productos INTEGER references productos (id), 
-id_usuarios INTEGER references usuarios (id))
+CREATE TABLE usuarios_likes (
+  id SERIAL PRIMARY KEY,
+  id_productos INTEGER REFERENCES productos(id) ON DELETE CASCADE,
+  id_usuarios INTEGER REFERENCES usuarios(id))
 
 
 INSERT INTO usuarios_likes (id_productos, id_usuarios) VALUES
@@ -73,4 +66,9 @@ INSERT INTO usuarios_likes (id_productos, id_usuarios) VALUES
 (8, 3),
 (9, 1),
 (10, 2);
-
+-- tabla carrito
+CREATE TABLE carrito (
+  id SERIAL PRIMARY KEY,
+  id_productos INTEGER REFERENCES productos(id) ON DELETE CASCADE,
+  id_usuarios INTEGER REFERENCES usuarios(id) ON DELETE CASCADE
+);

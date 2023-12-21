@@ -4,7 +4,7 @@ const bcrypt = require("bcryptjs");
 const pool = new Pool({
   host: "localhost",
   user: "postgres",
-  password: "2833",
+  password: "postgres",
   database: "retrogroove",
   port: 5432,
   allowExitOnIdle: true,
@@ -50,10 +50,25 @@ const verificarCredenciales = async (email, password) => {
   return usuario;
 };
 
-const vender = async (idUsuario, titulo, descripcion, formato, imagen, precio) => {
+const vender = async (
+  idUsuario,
+  titulo,
+  descripcion,
+  formato,
+  imagen,
+  precio
+) => {
   try {
-    const consultaProducto = "INSERT INTO productos (id_usuario, titulo, descripcion, formato, imagen, precio, vendido) VALUES ($1, $2, $3, $4, $5, $6, false) RETURNING id";
-    const valuesProducto = [idUsuario, titulo, descripcion, formato, imagen, precio];
+    const consultaProducto =
+      "INSERT INTO productos (id_usuario, titulo, descripcion, formato, imagen, precio, vendido) VALUES ($1, $2, $3, $4, $5, $6, false) RETURNING id";
+    const valuesProducto = [
+      idUsuario,
+      titulo,
+      descripcion,
+      formato,
+      imagen,
+      precio,
+    ];
     const resultProducto = await pool.query(consultaProducto, valuesProducto);
 
     if (resultProducto.rows[0]) {
@@ -85,7 +100,7 @@ const consultarProductos = async () => {
   if (result.rows.length > 0) {
     return result.rows;
   }
-}
+};
 
 const consultarLikesPorUsuario = async (idUsuario) => {
   const consulta =
@@ -146,6 +161,41 @@ const consultarProductosPorUsuario = async (idUsuario) => {
   return result.rows;
 };
 
+const consultarCarritoPorUsuario = async (idUsuario) => {
+  const consulta =
+    "SELECT c.id_productos, p.titulo, p.descripcion, p.formato, p.imagen, p.precio FROM carrito c JOIN productos p ON c.id_productos = p.id WHERE c.id_usuarios = $1";
+  const values = [idUsuario];
+  const result = await pool.query(consulta, values);
+  return result.rows;
+};
+
+const agregarProductoAlCarrito = async (idUsuario, idProducto) => {
+  const consulta =
+    "INSERT INTO carrito (id_usuarios, id_productos) VALUES ($1, $2)";
+  const values = [idUsuario, idProducto];
+  try {
+    const result = await pool.query(consulta, values);
+    return result.rowCount > 0;
+  } catch (error) {
+    console.error("Error al agregar producto a favoritos:", error);
+    throw error;
+  }
+};
+
+const eliminarProductoDelCarrito = async (idUsuario, idProducto) => {
+  const consulta =
+    "DELETE FROM carrito WHERE id_usuarios = $1 AND id_productos = $2";
+  const values = [idUsuario, idProducto];
+
+  try {
+    const result = await pool.query(consulta, values);
+    return result.rowCount > 0;
+  } catch (error) {
+    console.error("Error al eliminar producto del carrito:", error);
+    throw error;
+  }
+};
+
 module.exports = {
   vender,
   consultarProducto,
@@ -157,5 +207,8 @@ module.exports = {
   eliminarFavorito,
   borrarProducto,
   agregarProductoAFavoritos,
-  consultarProductosPorUsuario
+  consultarProductosPorUsuario,
+  consultarCarritoPorUsuario,
+  agregarProductoAlCarrito,
+  eliminarProductoDelCarrito,
 };
