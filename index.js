@@ -22,7 +22,7 @@ const {
 
 const { checkearCredenciales, verificarToken } = require("./middlewares.js");
 
-const PORT = 2999;
+const PORT = process.env.PORT || 2999;
 
 app.use(express.json());
 app.use(cors());
@@ -42,7 +42,7 @@ app.post("/login", checkearCredenciales, async (req, res) => {
     const { email, password } = req.body;
     const usuario = await verificarCredenciales(email, password);
     console.log("Usuario:", usuario);
-    const token = jwt.sign({ email }, "llaveSecreta", { expiresIn: "1h" });
+    const token = jwt.sign({ email }, process.env.TOKEN_SECRET, { expiresIn: "1h" });
     console.log("Token:", token);
     res.send(token);
   } catch (error) {
