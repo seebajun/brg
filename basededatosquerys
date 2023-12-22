@@ -8,7 +8,7 @@ descripcion Varchar(255),
 formato VARCHAR(10),
 imagen VARCHAR(255), 
 precio NUMERIC, 
-vendido BOOLEAN DEFAULT false)
+vendido BOOLEAN DEFAULT false)<
 
 INSERT INTO productos (id, id_usuario, titulo, descripcion, formato, imagen, precio)
 VALUES
@@ -66,6 +66,7 @@ INSERT INTO usuarios_likes (id_productos, id_usuarios) VALUES
 (8, 3),
 (9, 1),
 (10, 2);
+
 -- tabla carrito
 CREATE TABLE carrito (
   id SERIAL PRIMARY KEY,

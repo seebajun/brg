@@ -10,6 +10,7 @@ const pool = new Pool({
   allowExitOnIdle: true,
 });
 
+
 const obtenerDatosUsuario = async (email) => {
   const values = [email];
   const consulta = "SELECT * FROM usuarios WHERE email = $1";
