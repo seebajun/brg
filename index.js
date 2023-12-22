@@ -42,7 +42,7 @@ app.post("/login", checkearCredenciales, async (req, res) => {
     const { email, password } = req.body;
     const usuario = await verificarCredenciales(email, password);
     console.log("Usuario:", usuario);
-    const token = jwt.sign({ email }, process.env.TOKEN_SECRET, { expiresIn: "1h" });
+    const token = jwt.sign({ email }, "llaveSecreta", { expiresIn: "1h" });
     console.log("Token:", token);
     res.send(token);
   } catch (error) {
