@@ -2,16 +2,24 @@ const { Pool } = require("pg");
 const bcrypt = require("bcryptjs");
 require("dotenv").config();
 
+const DBConnLink = `postgres://${process.env.DB_USER}:${process.env.DB_PASS}@${process.env.DB_HOST}/${process.env.DB_DATABASE}`;
+
 const pool = new Pool({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASS,
-  database: process.env.DB_DATABASE,
-  port: 5432,
-  allowExitOnIdle: true,
-  ssl: true
+    connectionString: DBConnLink,
+    ssl: {
+        rejectUnauthorized: false
+    }
 });
 
+// const pool = new Pool({
+//   host: process.env.DB_HOST,
+//   user: process.env.DB_USER,
+//   password: process.env.DB_PASS,
+//   database: process.env.DB_DATABASE,
+//   port: 5432,
+//   allowExitOnIdle: true,
+//   ssl: true
+// });
 
 const obtenerDatosUsuario = async (email) => {
   const values = [email];
@@ -200,6 +208,7 @@ const eliminarProductoDelCarrito = async (idUsuario, idProducto) => {
 };
 
 module.exports = {
+  pool,
   vender,
   consultarProducto,
   registrarUsuario,
