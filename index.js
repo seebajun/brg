@@ -22,7 +22,7 @@ const {
 
 const { checkearCredenciales, verificarToken } = require("./middlewares.js");
 
-const PORT = process.env.PORT || 2999;
+const PORT = process.env.PORT;
 
 app.use(express.json());
 app.use(cors());

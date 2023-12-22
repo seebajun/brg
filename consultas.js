@@ -3,10 +3,10 @@ const bcrypt = require("bcryptjs");
 require("dotenv").config();
 
 const pool = new Pool({
-  host: "dpg-cm2g76q1hbls73fobbng-a.oregon-postgres.render.com",
-  user: "retrogroove_user",
-  password: "KqIq3u59m6cuxxO6ZZBejrZMqGAVV3JU",
-  database: "retrogroove",
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASS,
+  database: process.env.DB_DATABASE,
   port: 5432,
   allowExitOnIdle: true,
   ssl: true
